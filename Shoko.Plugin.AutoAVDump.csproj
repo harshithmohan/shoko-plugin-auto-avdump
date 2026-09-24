@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Version>1.0.0</Version>
+        <TreatAsLocalProperty>Version;InformationalVersion;TargetFramework</TreatAsLocalProperty>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Shoko.Abstractions" Version="6.0.0-alpha.94" ExcludeAssets="runtime" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7" ExcludeAssets="runtime" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" ExcludeAssets="runtime" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.7" ExcludeAssets="runtime" />
+        <PackageReference Include="Shoko.BuildTools.Targets" Version="0.3.1" PrivateAssets="All" ExcludeAssets="runtime" />
+    </ItemGroup>
+</Project>

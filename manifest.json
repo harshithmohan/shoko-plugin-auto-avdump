@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/ShokoAnime/ShokoServer/master/Shoko.BuildTools/manifest.schema.json",
+  "id": "5c522f64-6057-5b7e-b19d-aada4a097318",
+  "type": "package",
+  "name": "Auto AVDump",
+  "overview": "When an automatic release search fails, automatically dumps the unrecognized video through the built-in AVDump: its hashes and technical metadata are registered with AniDB — the first step of file registration; adding the dumped file to a series/episode is still manual.",
+  "authors": "harshithmohan",
+  "repository_url": "https://github.com/harshithmohan/shoko-plugin-auto-avdump",
+  "tags": [
+    "avdump",
+    "anidb",
+    "automation"
+  ],
+  "releases": []
+}

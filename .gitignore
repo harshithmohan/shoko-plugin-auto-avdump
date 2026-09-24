@@ -1,0 +1,11 @@
+bin/
+obj/
+*.user
+.vs/
+.vscode/
+.idea/
+*.nupkg
+*.log
+.DS_Store
+Thumbs.db
+dist/

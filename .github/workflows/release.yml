@@ -1,0 +1,71 @@
+name: Release Build
+
+env:
+  METADATA_BRANCH: metadata
+  MANIFEST_PATH: manifest.json
+  IDENTITY_MANIFEST: manifest.json
+  ASSET_BASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/download
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Fetch the live manifest
+        run: |
+          git fetch --no-tags origin "+refs/heads/${METADATA_BRANCH}:refs/remotes/origin/${METADATA_BRANCH}"
+          git show "origin/${METADATA_BRANCH}:${MANIFEST_PATH}" > "${IDENTITY_MANIFEST}"
+
+      - name: Read the release notes
+        env:
+          RELEASE_BODY: ${{ github.event.release.body }}
+        run: |
+          printf '%s' "${RELEASE_BODY}" > "${RUNNER_TEMP}/release-notes.md"
+
+      - name: Restore the build tool
+        run: dotnet tool restore
+
+      - name: Build and package
+        run: |
+          dotnet shoko-build \
+            --configuration Release \
+            --channel Dev \
+            --tag "${{ github.event.release.tag_name }}" \
+            --release-notes-path "${RUNNER_TEMP}/release-notes.md" \
+            --manifest "${GITHUB_WORKSPACE}/${IDENTITY_MANIFEST}" \
+            --output "${GITHUB_WORKSPACE}/dist/{name}-{tag}-{runtime}.zip" \
+            --url "${ASSET_BASE_URL}/{tag}/{name}-{tag}-{runtime}.zip" \
+            -- -p:RepositoryUrl=${{ github.server_url }}/${{ github.repository }}
+
+      - name: Upload to Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            dist/*.zip \
+            --repo "${{ github.repository }}"
+
+      - name: Commit the manifest on the metadata branch
+        run: |
+          cp "${IDENTITY_MANIFEST}" "${RUNNER_TEMP}/manifest.json"
+          git reset --hard
+          git checkout -B "${METADATA_BRANCH}" "origin/${METADATA_BRANCH}"
+          cp "${RUNNER_TEMP}/manifest.json" "${MANIFEST_PATH}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${MANIFEST_PATH}"
+          if git diff --cached --quiet; then
+            echo "Manifest unchanged; nothing to commit."
+          else
+            git commit -m "ci: update manifest for ${{ github.event.release.tag_name }}"
+            git push origin "${METADATA_BRANCH}"
+          fi
