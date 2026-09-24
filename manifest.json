@@ -15,6 +15,22 @@
   ],
   "releases": [
     {
+      "version": "0.0.2",
+      "tag": "v0.0.2",
+      "released_at": "2026-09-24T16:41:40.4809025Z",
+      "channel": "Dev",
+      "release_notes": "**Full Changelog**: https://github.com/harshithmohan/shoko-plugin-auto-avdump/compare/v0.0.1...v0.0.2",
+      "dependencies": [],
+      "archives": [
+        {
+          "runtime": "any",
+          "abstraction": "6.0.0",
+          "url": "https://github.com/harshithmohan/shoko-plugin-auto-avdump/releases/download/v0.0.2/AutoAVDump-v0.0.2-any.zip",
+          "checksum": "sha256:255db932ad640e5841fabfddfed3b361c389b581b06d10af80db62def48b7549"
+        }
+      ]
+    },
+    {
       "version": "0.0.1",
       "tag": "v0.0.1",
       "released_at": "2026-09-24T16:27:37.3515707Z",
