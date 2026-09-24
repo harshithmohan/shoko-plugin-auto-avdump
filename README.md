@@ -50,7 +50,7 @@ The plugin is built for the portable (`any`) runtime — no runtime identifier i
 ## Repository layout
 
 - `Shoko.Plugin.AutoAVDump.csproj`, `Plugin.cs` (identity and DI registration), `AutoAvdumpService.cs` (staging, batching, retry, state) — the plugin project, at the repository root.
-- `manifest.json` — a **stub** of the plugin manifest. It carries the real identity (id, name, overview, authors, tags) but an empty release list. The manifest that is actually published — with releases, checksums and download URLs — lives on the **`metadata` branch**. The release workflow builds from the fetched live manifest, uploads the archive to the GitHub release, and commits the updated manifest back to that branch only; nothing is ever written to `main`. So: expect no release entries in the `manifest.json` on this branch, and point the server at the `metadata` branch copy.
+- `manifest.json` — a **stub** of the plugin manifest. It carries the real identity (id, name, overview, authors, tags) but an empty release list. The manifest that is actually published — with releases, checksums and download URLs — lives on the **`metadata` branch**. **Every push to `main`** runs the release workflow: it auto-increments the version (a patch bump of the latest release tag), creates a GitHub release with auto-generated notes, builds the archive with `shoko-build` (pruning the manifest to the five most recent releases per channel), uploads the archive, and commits the updated manifest back to the `metadata` branch only; nothing is ever written to `main`. So: expect no release entries in the `manifest.json` on this branch, and point the server at the `metadata` branch copy.
 
 ## TODO
 

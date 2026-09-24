@@ -1,5 +1,13 @@
 name: Release Build
 
+on:
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
 env:
   METADATA_BRANCH: metadata
   MANIFEST_PATH: manifest.json
@@ -20,16 +28,28 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Get new version
+        uses: zwaldowski/semver-release-action@v6
+        id: semver
+        with:
+          bump: patch
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: true
+
       - name: Fetch the live manifest
         run: |
           git fetch --no-tags origin "+refs/heads/${METADATA_BRANCH}:refs/remotes/origin/${METADATA_BRANCH}"
           git show "origin/${METADATA_BRANCH}:${MANIFEST_PATH}" > "${IDENTITY_MANIFEST}"
 
-      - name: Read the release notes
+      - name: Create release
         env:
-          RELEASE_BODY: ${{ github.event.release.body }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          printf '%s' "${RELEASE_BODY}" > "${RUNNER_TEMP}/release-notes.md"
+          gh release create "v${{ steps.semver.outputs.version }}" \
+            --title "v${{ steps.semver.outputs.version }}" \
+            --generate-notes
+          gh release view "v${{ steps.semver.outputs.version }}" \
+            --json body --template '{{.body}}' > "${RUNNER_TEMP}/release-notes.md"
 
       - name: Restore the build tool
         run: dotnet tool restore
@@ -39,18 +59,19 @@ jobs:
           dotnet shoko-build \
             --configuration Release \
             --channel Dev \
-            --tag "${{ github.event.release.tag_name }}" \
+            --tag "v${{ steps.semver.outputs.version }}" \
+            --prune 5 \
             --release-notes-path "${RUNNER_TEMP}/release-notes.md" \
             --manifest "${GITHUB_WORKSPACE}/${IDENTITY_MANIFEST}" \
             --output "${GITHUB_WORKSPACE}/dist/{name}-{tag}-{runtime}.zip" \
             --url "${ASSET_BASE_URL}/{tag}/{name}-{tag}-{runtime}.zip" \
-            -- -p:RepositoryUrl=${{ github.server_url }}/${{ github.repository }}
+            -- -p:Version=${{ steps.semver.outputs.version }} -p:RepositoryUrl=${{ github.server_url }}/${{ github.repository }}
 
-      - name: Upload to Release
+      - name: Upload to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ github.event.release.tag_name }}" \
+          gh release upload "v${{ steps.semver.outputs.version }}" \
             dist/*.zip \
             --repo "${{ github.repository }}"
 
@@ -66,6 +87,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Manifest unchanged; nothing to commit."
           else
-            git commit -m "ci: update manifest for ${{ github.event.release.tag_name }}"
+            git commit -m "ci: update manifest for v${{ steps.semver.outputs.version }}"
             git push origin "${METADATA_BRANCH}"
           fi
