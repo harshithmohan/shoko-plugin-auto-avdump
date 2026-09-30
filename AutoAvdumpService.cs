@@ -139,12 +139,12 @@ public class AutoAvdumpService : IHostedService
         if (!e.IsAutomatic || e.IsSuccessful)
             return;
 
-        var video = _videoService.GetVideoByID(e.Video.ID);
-        if (video is null || video.IsIgnored || video.Episodes.Count > 0 || ShouldSkip(video.ID))
+        var video = _videoService.GetVideoByID(e.Video.LocalID);
+        if (video is null || video.IsIgnored || video.Episodes.Count > 0 || ShouldSkip(video.LocalID))
             return;
 
-        _pending[video.ID] = video;
-        _logger.LogDebug("Staged video {VideoID} for AVDump after a failed automatic release search.", video.ID);
+        _pending[video.LocalID] = video;
+        _logger.LogDebug("Staged video {VideoID} for AVDump after a failed automatic release search.", video.LocalID);
     }
 
     private void OnEpisodeAdded(object? sender, EpisodeInfoUpdatedEventArgs e)
@@ -154,8 +154,8 @@ public class AutoAvdumpService : IHostedService
         // here is harmless.
         foreach (var video in e.EpisodeInfo.Videos)
         {
-            if (_pending.TryRemove(video.ID, out _))
-                _logger.LogDebug("Dropped video {VideoID} from the AVDump batch. It is now linked to an episode.", video.ID);
+            if (_pending.TryRemove(video.LocalID, out _))
+                _logger.LogDebug("Dropped video {VideoID} from the AVDump batch. It is now linked to an episode.", video.LocalID);
         }
     }
 
@@ -168,7 +168,7 @@ public class AutoAvdumpService : IHostedService
         foreach (var videoID in _pending.Keys)
         {
             var video = _videoService.GetVideoByID(videoID);
-            if (video is null || video.IsIgnored || video.Episodes.Count > 0 || ShouldSkip(video.ID))
+            if (video is null || video.IsIgnored || video.Episodes.Count > 0 || ShouldSkip(video.LocalID))
             {
                 _pending.TryRemove(videoID, out _);
                 continue;
@@ -188,7 +188,7 @@ public class AutoAvdumpService : IHostedService
         lock (_stateLock)
         {
             foreach (var video in batch)
-                _submitted.Add(video.ID);
+                _submitted.Add(video.LocalID);
         }
 
         try
@@ -196,14 +196,14 @@ public class AutoAvdumpService : IHostedService
             await _avdumpService.ScheduleAvdumpVideos([.. batch]);
 
             foreach (var video in batch)
-                _pending.TryRemove(video.ID, out _);
+                _pending.TryRemove(video.LocalID, out _);
 
             if (batch.Count == videos.Count)
             {
                 _logger.LogInformation(
                     "Scheduled AVDump for {Count} video(s): {VideoIDs}.",
                     batch.Count,
-                    string.Join(", ", batch.Select(x => x.ID)));
+                    string.Join(", ", batch.Select(x => x.LocalID)));
             }
             else
             {
@@ -211,7 +211,7 @@ public class AutoAvdumpService : IHostedService
                     "Scheduled AVDump for {Count} of {Total} staged video(s): {VideoIDs}. The remaining {Remaining} stay staged for later flushes.",
                     batch.Count,
                     videos.Count,
-                    string.Join(", ", batch.Select(x => x.ID)),
+                    string.Join(", ", batch.Select(x => x.LocalID)),
                     videos.Count - batch.Count);
             }
         }
@@ -220,7 +220,7 @@ public class AutoAvdumpService : IHostedService
             lock (_stateLock)
             {
                 foreach (var video in batch)
-                    _submitted.Remove(video.ID);
+                    _submitted.Remove(video.LocalID);
             }
 
             _logger.LogError(
