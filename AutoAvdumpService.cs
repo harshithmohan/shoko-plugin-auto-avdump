@@ -362,7 +362,7 @@ public class AutoAvdumpService : IHostedService
         if (success)
         {
             _logger.LogInformation(
-                "AVDump succeeded for {Count} video(s): {VideoIDs}. They are now dumped; adding them to AniDB (a series/episode) is the manual second step.",
+                "AVDump succeeded for {Count} video(s): {VideoIDs}.",
                 affected.Count,
                 string.Join(", ", affected));
         }
