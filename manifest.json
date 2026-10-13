@@ -15,6 +15,22 @@
   ],
   "releases": [
     {
+      "version": "0.0.6",
+      "tag": "v0.0.6",
+      "released_at": "2026-10-13T08:58:29.531381Z",
+      "channel": "Dev",
+      "release_notes": "**Full Changelog**: https://github.com/harshithmohan/shoko-plugin-auto-avdump/compare/v0.0.5...v0.0.6",
+      "dependencies": [],
+      "archives": [
+        {
+          "runtime": "any",
+          "abstraction": "6.0.0",
+          "url": "https://github.com/harshithmohan/shoko-plugin-auto-avdump/releases/download/v0.0.6/AutoAVDump-v0.0.6-any.zip",
+          "checksum": "sha256:0795e35dd38460368997c642bb5b21175e4d8113a2cb1f0c35a991e8f3d70b01"
+        }
+      ]
+    },
+    {
       "version": "0.0.5",
       "tag": "v0.0.5",
       "released_at": "2026-10-03T17:11:19.5911338Z",
@@ -75,22 +91,6 @@
           "abstraction": "6.0.0",
           "url": "https://github.com/harshithmohan/shoko-plugin-auto-avdump/releases/download/v0.0.2/AutoAVDump-v0.0.2-any.zip",
           "checksum": "sha256:255db932ad640e5841fabfddfed3b361c389b581b06d10af80db62def48b7549"
-        }
-      ]
-    },
-    {
-      "version": "0.0.1",
-      "tag": "v0.0.1",
-      "released_at": "2026-09-24T16:27:37.3515707Z",
-      "channel": "Dev",
-      "release_notes": "**Full Changelog**: https://github.com/harshithmohan/shoko-plugin-auto-avdump/commits/v0.0.1",
-      "dependencies": [],
-      "archives": [
-        {
-          "runtime": "any",
-          "abstraction": "6.0.0",
-          "url": "https://github.com/harshithmohan/shoko-plugin-auto-avdump/releases/download/v0.0.1/AutoAVDump-v0.0.1-any.zip",
-          "checksum": "sha256:b5b1a8a7624ff110fd7f02d39b66f353b262ffc3ef9a9058bbfc77e3b17f79ba"
         }
       ]
     }
